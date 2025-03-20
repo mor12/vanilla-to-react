@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML Example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-4">
+    <!-- Group 1-6 -->
+    <div class="row" id="group1">
+        <div class="col border p-2 text-center" id="test1">test1</div>
+        <div class="col border p-2 text-center" id="test2">test2</div>
+        <div class="col border p-2 text-center" id="test3">test3</div>
+        <div class="col border p-2 text-center" id="test4">test4</div>
+        <div class="col border p-2 text-center" id="test5">test5</div>
+        <div class="col border p-2 text-center" id="test6">test6</div>
+    </div>
+
+    <!-- Group 7-8 -->
+    <div class="row mt-2" id="group2">
+        <div class="col border p-2 text-center" id="test7">test7</div>
+        <div class="col border p-2 text-center" id="test8">test8</div>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="mt-3">
+        <div class="row">
+            <div class="col">
+                <button id="btn-test1" class="btn btn-primary" onclick="toggleVisibility('test1')">Toggle Test1</button>
+                <button id="btn-test2" class="btn btn-primary" onclick="toggleVisibility('test2')">Toggle Test2</button>
+                <button id="btn-test3" class="btn btn-primary" onclick="toggleVisibility('test3')">Toggle Test3</button>
+                <button id="btn-test4" class="btn btn-primary" onclick="toggleVisibility('test4')">Toggle Test4</button>
+                <button id="btn-test5" class="btn btn-primary" onclick="toggleVisibility('test5')">Toggle Test5</button>
+                <button id="btn-test6" class="btn btn-primary" onclick="toggleVisibility('test6')">Toggle Test6</button>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col">
+                <button id="btn-test7" class="btn btn-secondary" onclick="toggleVisibility('test7')">Toggle Test7</button>
+                <button id="btn-test8" class="btn btn-secondary" onclick="toggleVisibility('test8')">Toggle Test8</button>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col">
+                <button class="btn btn-success" onclick="saveState()">Save State</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // Function to toggle visibility of an element
+    function toggleVisibility(id) {
+        const element = document.getElementById(id);
+        const button = document.getElementById(`btn-${id}`);
+
+        if (element) {
+            element.classList.toggle('d-none');
+
+            if (element.classList.contains('d-none')) {
+                button.classList.add('disabled', 'btn-secondary');
+                button.classList.remove('btn-primary', 'btn-secondary');
+                button.innerText = `Enable ${id.charAt(0).toUpperCase() + id.slice(1)}`;
+            } else {
+                button.classList.remove('disabled', 'btn-secondary');
+                button.classList.add('btn-primary');
+                button.innerText = `Disable ${id.charAt(0).toUpperCase() + id.slice(1)}`;
+            }
+
+            const group1 = document.getElementById('group1');
+            const group2 = document.getElementById('group2');
+
+            group1.classList.remove('row');
+            void group1.offsetWidth;
+            group1.classList.add('row');
+
+            group2.classList.remove('row');
+            void group2.offsetWidth;
+            group2.classList.add('row');
+        }
+    }
+
+    // Function to save state of elements
+    function saveState() {
+        const elements = document.querySelectorAll('[id^="test"]');
+        const state = {};
+
+        elements.forEach(el => {
+            state[el.id] = !el.classList.contains('d-none');
+        });
+
+        console.log('Saved State:', JSON.stringify(state));
+
+        fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(state)
+        }).then(response => {
+            if (response.ok) {
+                alert('State saved successfully!');
+            }
+        }).catch(err => console.error('Error:', err));
+    }
+
+    // Function to initialize buttons based on element visibility
+    function initButtons() {
+        const elements = document.querySelectorAll('[id^="test"]');
+        elements.forEach(el => {
+            const button = document.getElementById(`btn-${el.id}`);
+            if (el.classList.contains('d-none')) {
+                button.classList.add('disabled', 'btn-secondary');
+                button.classList.remove('btn-primary');
+                button.innerText = `Enable ${el.id.charAt(0).toUpperCase() + el.id.slice(1)}`;
+            } else {
+                button.classList.remove('disabled', 'btn-secondary');
+                button.classList.add('btn-primary');
+                button.innerText = `Disable ${el.id.charAt(0).toUpperCase() + el.id.slice(1)}`;
+            }
+        });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', initButtons);
+</script>
+
+</body>
+</html>

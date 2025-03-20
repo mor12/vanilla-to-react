@@ -1,0 +1,10 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.row > div {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
