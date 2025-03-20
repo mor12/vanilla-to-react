@@ -1,11 +1,10 @@
 import { useState } from 'react';
+import DivItem from './components/DivItem';
+import ControlPanel from './components/ControlPanel';
 
-type StateType = {
-  [key: string]: boolean;
-};
+const App: React.FC = () => {
 
-const App = () => {
-  const initialState: StateType = {
+  const [state, setState] = useState<Record<string, boolean>>({
     test1: true,
     test2: true,
     test3: true,
@@ -14,11 +13,9 @@ const App = () => {
     test6: true,
     test7: true,
     test8: true
-  };
+  });
 
-  const [state, setState] = useState(initialState);
 
-  // ✅ Toggle para activar/desactivar elementos y botones
   const toggleVisibility = (key: string) => {
     setState((prevState) => ({
       ...prevState,
@@ -26,7 +23,7 @@ const App = () => {
     }));
   };
 
-  // ✅ Guardar estado (simulación de llamada a una API)
+
   const saveState = async () => {
     console.log('Saved State:', JSON.stringify(state));
 
@@ -39,9 +36,11 @@ const App = () => {
         body: JSON.stringify(state)
       });
 
-      if (response.ok) {
-        alert('State saved successfully!');
+      if (!response.ok) {
+        throw new Error(`Failed to save state: ${response.status}`);
       }
+
+      alert('State saved successfully!');
     } catch (error) {
       console.error('Error:', error);
     }
@@ -49,67 +48,22 @@ const App = () => {
 
   return (
     <div className="container mt-4">
-      {/* ✅ Group 1-6 */}
+      {/* Group 1-6 */}
       <div className="row">
         {Object.keys(state).slice(0, 6).map((key) => (
-          state[key] && (
-            <div key={key} className="col border p-2 text-center">
-              {key}
-            </div>
-          )
+          <DivItem key={key} id={key} visible={state[key]} />
         ))}
       </div>
 
-      {/* ✅ Group 7-8 */}
+      {/* Group 7-8 */}
       <div className="row mt-2">
         {Object.keys(state).slice(6).map((key) => (
-          state[key] && (
-            <div key={key} className="col border p-2 text-center">
-              {key}
-            </div>
-          )
+          <DivItem key={key} id={key} visible={state[key]} />
         ))}
       </div>
 
-      {/* ✅ Botones de control */}
-      <div className="mt-3">
-        <div className="row">
-          <div className="col">
-            {Object.keys(state).slice(0, 6).map((key) => (
-              <button
-                key={key}
-                className={`btn ${state[key] ? 'btn-primary' : 'btn-secondary'} mr-2`}
-                onClick={() => toggleVisibility(key)}
-              >
-                {state[key] ? `Disable ${key}` : `Enable ${key}`}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="row mt-2">
-          <div className="col">
-            {Object.keys(state).slice(6).map((key) => (
-              <button
-                key={key}
-                className={`btn ${state[key] ? 'btn-primary' : 'btn-secondary'} mr-2`}
-                onClick={() => toggleVisibility(key)}
-              >
-                {state[key] ? `Disable ${key}` : `Enable ${key}`}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ✅ Botón para guardar el estado */}
-        <div className="row mt-2">
-          <div className="col">
-            <button className="btn btn-success" onClick={saveState}>
-              Save State
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Control Panel */}
+      <ControlPanel state={state} onToggle={toggleVisibility} onSave={saveState} />
     </div>
   );
 };
